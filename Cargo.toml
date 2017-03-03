@@ -1,0 +1,8 @@
+[package]
+name = "petgraph-examples"
+version = "0.1.0"
+authors = ["jonas"]
+
+[dependencies]
+petgraph = {path = "../petgraph/"}
+

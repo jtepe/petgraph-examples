@@ -1,0 +1,28 @@
+[root]
+name = "petgraph-examples"
+version = "0.1.0"
+dependencies = [
+ "petgraph 0.4.3",
+]
+
+[[package]]
+name = "fixedbitset"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "ordermap"
+version = "0.2.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "petgraph"
+version = "0.4.3"
+dependencies = [
+ "fixedbitset 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "ordermap 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[metadata]
+"checksum fixedbitset 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "88c3c33fc4c00db33f5174eb98aea809c4c007db0b71351d810a7e094ea3b64d"
+"checksum ordermap 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)" = "2bbbbe8a0d58a4c17b279401ba7aef107deac26d7ef07ff0008f69eb17ae97bf"
