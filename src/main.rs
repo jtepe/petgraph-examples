@@ -2,6 +2,8 @@ extern crate petgraph;
 
 use std::collections::HashMap;
 use std::hash::Hash;
+use std::fmt;
+use std::error::Error;
 
 use petgraph::visit::{IntoNodeIdentifiers, IntoEdgeReferences, NodeCompactIndexable, EdgeRef};
 use petgraph::algo::FloatMeasure;
@@ -15,24 +17,22 @@ fn main() {
     let v2 = g.add_node("v2");
     let v3 = g.add_node("v3");
 
-    g.extend_with_edges(&[
-        (v0, v1, 2.2),
-        (v1, v2, 2.4),
-        (v2, v0, 1.3),
-        (v3, v2, -1.0),
-    ]);
+    g.extend_with_edges(&[(v0, v1, 2.2), (v1, v2, 2.4), (v2, v0, -5.3), (v3, v2, -1.0)]);
 
     match bellman_ford(&g, v0) {
         Ok(lengths) => {
             println!("δ(v2) = {:.1}", lengths.get(&v2).unwrap());
-        },
-        Err(message) => {
-            println!("{}", message);
+        }
+        Err(err) => {
+            println!("{}", err);
         }
     }
 }
 
-fn bellman_ford<G>(g: G, s: G::NodeId) -> Result<HashMap<G::NodeId, G::EdgeWeight>, String>
+fn bellman_ford<G>
+    (g: G,
+     s: G::NodeId)
+     -> Result<HashMap<G::NodeId, G::EdgeWeight>, CycleError<(G::NodeId, G::NodeId)>>
     where G: IntoNodeIdentifiers + NodeCompactIndexable + IntoEdgeReferences,
           G::EdgeWeight: FloatMeasure,
           G::NodeId: Eq + Hash
@@ -64,13 +64,28 @@ fn bellman_ford<G>(g: G, s: G::NodeId) -> Result<HashMap<G::NodeId, G::EdgeWeigh
             Some(&target_len) => {
                 if let Some(&source_len) = lengths.get(&e.source()) {
                     if target_len > source_len + *e.weight() {
-                        return Err("Negative cycle!".to_string());
+                        return Err(CycleError((e.source(), e.target())));
                     }
                 }
-            },
+            }
             None => {}
         }
     }
-    
+
     Ok(lengths)
+}
+
+#[derive(Debug)]
+struct CycleError<E>(E);
+
+impl<E: fmt::Debug> Error for CycleError<E> {
+    fn description(&self) -> &str {
+        "The graph contains a negative cycle."
+    }
+}
+
+impl<E: fmt::Debug> fmt::Display for CycleError<E> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "A negative cycle detected at {:?}.", self.0)
+    }
 }
